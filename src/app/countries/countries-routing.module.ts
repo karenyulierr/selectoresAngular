@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SelectotPageComponent } from './pages/selectot-page/selectot-page.component';
+import { SelectotPageComponente } from './pages/selectot-page/selectot-page.component';
+
 
 const routes: Routes = [
   {
     path: '',
     children: [
 
-      { path: 'selector', component: SelectotPageComponent },
+      { path: 'selector', component: SelectotPageComponente },
       { path: '**', redirectTo: 'selector' },
 
     ]

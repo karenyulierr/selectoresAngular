@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { CountriesService } from '../../services/countries.service';
-import { Region } from '../../interfaces/country.interface';
+import { Region, SmallCountry } from '../../interfaces/country.interface';
+import { Observable, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-selectot-page',
@@ -11,10 +12,13 @@ import { Region } from '../../interfaces/country.interface';
 })
 export class SelectotPageComponente implements OnInit {
 
+  public countriesByRegion: SmallCountry[] = [];
+  public borders: SmallCountry[] = [];
+
   public myForm: FormGroup = this.fb.group({
     region: ['', Validators.required],
     country: ['', Validators.required],
-    borders: ['', Validators.required],
+    border: ['', Validators.required],
   })
 
   constructor(private fb: FormBuilder,
@@ -22,6 +26,7 @@ export class SelectotPageComponente implements OnInit {
 
   ngOnInit(): void {
     this.onRegionChanged();
+    this.onCountryChanged();
   }
 
   get regions(): Region[] {
@@ -30,9 +35,27 @@ export class SelectotPageComponente implements OnInit {
 
   onRegionChanged(): void {
     this.myForm.get('region')!.valueChanges
-      .subscribe(region => {
-        console.log({ region });
-      })
+      .pipe(
+        tap( () => this.myForm.get('country')!.setValue('') ),
+        tap( () => this.borders = [] ),
+        switchMap( (region) => this.countriesService.getCountriesByRegion(region) ),
+      )
+      .subscribe( countries => {
+        this.countriesByRegion = countries;
+      });
   }
+
+  onCountryChanged():void{
+    this.myForm.get('country')!.valueChanges
+      .pipe(
+        tap( () => this.myForm.get('border')!.setValue('') ),
+        tap( () => this.borders = [] ),
+        // switchMap( (region) => this.countriesService.getCountriesByRegion(region) ),
+      )
+      .subscribe( borders => {
+        console.log(borders);
+      });
+  }
+
 
 }
